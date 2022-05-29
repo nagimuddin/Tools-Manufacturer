@@ -92,36 +92,48 @@ async function run() {
       const result = await toolsCollection.findOne(query);
       res.send(result);
     });
-//update service
-app.put('/tools/:id', async (req, res) => {
-    const { id } = req.params;
-    const query = { _id: ObjectId(id) };
-    const newService = req.body;
-    const { available } = newService;
-    const options = { upsert: true };
-    const updateDoc = {
+    //update service
+    app.put("/tools/:id", async (req, res) => {
+      const { id } = req.params;
+      const query = { _id: ObjectId(id) };
+      const newService = req.body;
+      const { available } = newService;
+      const options = { upsert: true };
+      const updateDoc = {
         $set: { available },
-    };
-    const result = await toolsCollection.updateOne(query, updateDoc, options);
-    res.send({ message: 'updated' });
-});
+      };
+      const result = await toolsCollection.updateOne(query, updateDoc, options);
+      res.send({ message: "updated" });
+    });
 
-//specific order by query 
-app.get('/orders', verifyJWT, async (req, res) => {
-    const email = req.query.email;
-    const query = { email: email };
-    const result = await orderCollection.find(query).toArray();
-    res.send(result);
-});
+    //specific order by query
+    app.get("/orders", verifyJWT, async (req, res) => {
+      const email = req.query.email;
+      const query = { email: email };
+      const result = await orderCollection.find(query).toArray();
+      res.send(result);
+    });
 
-//specific order by query 
-app.get('/order/:id', verifyJWT, async (req, res) => {
-    const { id } = req.params;
-    const query = { _id: ObjectId(id) };
-    const result = await orderCollection.findOne(query);
-    res.send(result);
-});
+    //specific order by query
+    app.get("/order/:id", verifyJWT, async (req, res) => {
+      const { id } = req.params;
+      const query = { _id: ObjectId(id) };
+      const result = await orderCollection.findOne(query);
+      res.send(result);
+    });
 
+    //sending to orders db
+    app.post("/orders", async (req, res) => {
+      const order = req.body;
+      const result = await orderCollection.insertOne(order);
+      res.send({ success: true });
+    });
+
+    //all orders for admin
+    app.get("/all-orders", async (req, res) => {
+      const result = await orderCollection.find({}).toArray();
+      res.send(result);
+    });
   } finally {
   }
 }
